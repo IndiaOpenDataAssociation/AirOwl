@@ -48,9 +48,8 @@ boolean retAp = 0;
 boolean extra = 0;
 boolean dataFlag = 1;
 int dustPart = 0;
-
 int inpin = 12;
-
+int got_data=0;
 char MACAddress[12];
 
 // DNS server
@@ -288,6 +287,7 @@ void getNovaData(void)
         break;
       }
       i = 0;
+      got_data=1;
     }
     i++;
     delay(10);
@@ -329,8 +329,9 @@ void Get_data(void)
     send_data_flag = 1;
   }
 
-  if (send_data_flag == 1 && millis() - convTime > 1000)
+  if (send_data_flag == 1 && millis() - convTime > 1000 && got_data==1)
   {
+    got_data=0;
     //Serial.println("Sending data");
     SendSensorData();
   }
