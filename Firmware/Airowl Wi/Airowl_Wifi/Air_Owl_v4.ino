@@ -190,7 +190,19 @@ void loop() {
 
   if (ap_flag == 0)
   {
+    
+    if(dustPart ==12)
+    {
+    getNovaData();
+    }
+    else if(dustPart == 11)
+    {
+      getWinsenData();
+    }
+    if(PM10>0 && PM25>0)
+    {
     Get_data();
+    }
 
     timeUnix = (millis() - timeStart) / 1000 + timeNTPstart;
 
