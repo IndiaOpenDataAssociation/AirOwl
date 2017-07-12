@@ -28,7 +28,7 @@ int status = WL_IDLE_STATUS;
 
 unsigned int address = 7;
 unsigned int total_ssid = 0, store_address = 0, timestart = 0, flag = 0, val = 0, ap_set = 0, s = 0, j = 0, k = 0;
-unsigned int set_limit =3; //set the number of wifi to be remembered by the module
+unsigned int set_limit =2; //set the number of wifi to be remembered by the module
 char wifissid[20], wifipswd[20];  //used to get  the stored ssid and password in EEPROM
 String ssid1(wifissid), pswd2(wifipswd);//string obatined from reading data of eeprom
 int cpy_srt = 0, cpy_end = 0, addr = 7; //variables used to delete previous stored ssid and password from eeprom
@@ -418,6 +418,8 @@ void init_wifi(void)
   // We start by connecting to a WiFi network
   //WiFi.setAutoConnect(1);
 
+
+Serial.println("MILI");
   if (WiFi.status() != WL_CONNECTED)
   {
     WiFi.disconnect();
@@ -469,6 +471,7 @@ void init_wifi(void)
 /******************************/
 void initApMode()
 {
+ 
   ledColor(255, 0, 255);
   WiFi.disconnect();
   server.onNotFound ( handleNotFound );
@@ -496,24 +499,30 @@ void initApMode()
 void initialize_sensors(void)
 {
   delay(5000);
+  Serial.println("rock");
+  if (extra == 0 && ap_set == 0)
+  {
+    wifi_check();
+    
+  }
   // Check wifi status to start AP Mode
   if (!WiFi.isConnected() && retAp == 0)
   {
     ap_flag = 1;
+    
   }
   else
   {
     ap_flag = 0;
+   
   }
 
   if (extra)
   {
     ap_flag = 1;
+    
   }
-  if (extra == 0 && ap_set == 0)
-  {
-    wifi_check();
-  }
+  
 
   if (ap_flag == 1)
   {
@@ -957,13 +966,15 @@ void Eeprom_store(void)
   EEPROM.commit();
 }
 
-void wifi_check()              //checks availability of presence of wifi tored in eeprom
+void wifi_check()//checks availability of presence of wifi stored in eeprom
 {
+  
   s = EEPROM.read(0) + 1;
-
-  while (s >= 2)
+  Serial.println(s);
+  while ((s >= 2) && (EEPROM.read(0)!=0))
   {
     store_address = EEPROM.read(s);
+   
     j = 0;
     k = 0;
     while (EEPROM.read(store_address) != '\0')
@@ -971,6 +982,7 @@ void wifi_check()              //checks availability of presence of wifi tored i
       wifissid[j] = EEPROM.read(store_address);
       store_address++;
       j++;
+      
     }
     wifissid[j] = '\0';
     store_address++;
@@ -986,15 +998,18 @@ void wifi_check()              //checks availability of presence of wifi tored i
     String ssid3(wifissid), pswd3(wifipswd);
     ssid1 = ssid3;
     pswd2 = pswd3;
+    Serial.println(ssid1);
+    Serial.println(pswd2);
     WiFi.begin(ssid1.c_str(), pswd2.c_str());
     timestart = millis();
-    while ((WiFi.status() != WL_CONNECTED) && millis() - timestart < 5000)
+    while ((WiFi.status() != WL_CONNECTED) && millis() - timestart < 10000)
     {
       delay(500);
+      
     }
     if (WiFi.status() == WL_CONNECTED)
     {
-
+      
       ap_flag = 0;
       break;
     }
@@ -1044,4 +1059,3 @@ void call_ap()
   extra = 1;
 
 }
-
